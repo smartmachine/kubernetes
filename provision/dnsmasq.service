@@ -1,0 +1,32 @@
+[Unit]
+Description=dnsmasq
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Slice=machine.slice
+ExecStartPre=/usr/bin/rkt trust --prefix "quay.io/coreos/dnsmasq" --skip-fingerprint-review
+ExecStart=/usr/bin/rkt run --net=host --dns=host \
+  quay.io/coreos/dnsmasq \
+  --caps-retain=CAP_NET_ADMIN,CAP_NET_BIND_SERVICE,CAP_SETGID,CAP_SETUID,CAP_NET_RAW \
+  -- -k \
+  --dhcp-range=192.168.99.3,192.168.99.254 \
+  --enable-tftp \
+  --tftp-root=/var/lib/tftpboot \
+  --dhcp-userclass=set:ipxe,iPXE \
+  --dhcp-boot=tag:#ipxe,undionly.kpxe \
+  --dhcp-boot=tag:ipxe,http://matchbox.kube.com:8080/boot.ipxe \
+  --address=/matchbox.kube.com/192.168.99.2 \
+  --ptr-record=2.99.168.192.in-addr.arpa,matchbox.kube.com \
+  --cname=cluster.kube.com,master-1.kube.com \
+  --domain=kube.com \
+  --local=/kube.com/ \
+  --expand-hosts \
+  --log-facility=- \
+  --log-queries \
+  --log-dhcp
+KillMode=mixed
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

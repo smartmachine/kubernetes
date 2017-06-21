@@ -1,0 +1,5 @@
+{
+	"id": "bootkube-worker",
+	"ignition_id": "bootkube-worker.yaml.tmpl",
+	"boot": {}
+}

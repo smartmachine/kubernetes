@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+vagrant ssh $1 -- -l core -i ~/.ssh/id_rsa

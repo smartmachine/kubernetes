@@ -1,0 +1,5 @@
+.vagrant
+config/user-data
+config/bootkube
+config/matchbox/certs
+config/assets

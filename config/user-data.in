@@ -1,0 +1,8 @@
+#cloud-config
+
+---
+coreos:
+  update:
+    reboot-strategy: off
+ssh_authorized_keys:
+hostname: matchbox
