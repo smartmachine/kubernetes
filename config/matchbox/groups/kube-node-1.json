@@ -7,6 +7,7 @@
 	},
 	"metadata": {
 		"domain_name": "node-1.kube.com",
+    "iqn": "iqn.2016-04.com.coreos.iscsi:43bba626f1af414582034fe254dd3f45",
 		"etcd_endpoints": "https://master-1.kube.com:2379",
 		"etcd_on_host": "true",
 		"k8s_dns_service_ip": "10.3.0.10",

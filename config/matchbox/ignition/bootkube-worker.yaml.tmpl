@@ -3,6 +3,8 @@ systemd:
   units:
     - name: docker.service
       enable: true
+    - name: iscsid.service
+      enable: true
     - name: locksmithd.service
       dropins:
         - name: 40-etcd-lock.conf
@@ -45,7 +47,11 @@ systemd:
         Description=Kubelet via Hyperkube ACI
         [Service]
         EnvironmentFile=/etc/kubernetes/kubelet.env
-        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/run/kubelet-pod.uuid \
+        Environment="RKT_RUN_ARGS=--volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
+          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
+          --volume iscsietc,kind=host,source=/etc/iscsi \
+          --mount volume=iscsietc,target=/etc/iscsi \
+          --uuid-file-save=/var/run/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
           --mount volume=resolv,target=/etc/resolv.conf \
           --volume var-lib-cni,kind=host,source=/var/lib/cni \
@@ -58,6 +64,7 @@ systemd:
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/inactive-manifests
         ExecStartPre=/bin/mkdir -p /var/lib/cni
         ExecStartPre=/usr/bin/bash -c "grep 'certificate-authority-data' /etc/kubernetes/kubeconfig | awk '{print $2}' | base64 -d > /etc/kubernetes/ca.crt"
+        ExecStartPre=/usr/sbin/modprobe iscsi_tcp
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --kubeconfig=/etc/kubernetes/kubeconfig \
@@ -104,7 +111,7 @@ storage:
       contents:
         inline: |
           KUBELET_IMAGE_URL=quay.io/coreos/hyperkube
-          KUBELET_IMAGE_TAG=v1.6.4_coreos.0
+          KUBELET_IMAGE_TAG=v1.6.6_coreos.1
     - path: /etc/hostname
       filesystem: root
       mode: 0644
@@ -116,6 +123,19 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+    - path: /etc/docker/daemon.json
+      filesystem: root
+      contents:
+        inline: |
+          {
+            "insecure-registries": ["cluster.kube.com:30500"]
+          }
+    - path: /etc/iscsi/initiatorname.iscsi
+      filesystem: root
+      mode: 0640
+      contents:
+        inline: |
+          InitiatorName={{.iqn}}
 passwd:
   users:
     - name: core

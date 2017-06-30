@@ -1,22 +1,30 @@
 $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 $image_version = "current"
 $update_channel='stable'
-$kubernetes_masters = 1
-$kubernetes_workers = 2
 
 # Customize VMs
 $vm_private_key = File.join(File.dirname(__FILE__), "../keys/id_rsa")
 $vm_public_key = File.join(File.dirname(__FILE__), "../keys/id_rsa.pub")
 $vm_gui = false
-$vm_memory = 1024
-$vm_cpus = 1
+$matchbox_memory = 1024
+$master_memory = 2048
+$node_memory = 4096
+$vm_cpus = 2
 $vb_cpuexecutioncap = 100
 
-$mac_addresses = {
-  :master_1 => '0800278DC14D',
-  :node_1   => '0800278DC15D',
-  :node_2   => '0800278DC16D',
-  :node_3   => '0800278DC17D',
+$node_data = {
+  :master_1 => {
+    :mac => '0800278DC14D'
+  },
+  :node_1   => {
+    :mac => '0800278DC15D'
+  },
+  :node_2   => {
+    :mac => '0800278DC16D'
+  },
+  :node_3   => {
+    :mac => '0800278DC17D'
+  }
 }
 
 if File.exists?('config/user-data.in') && ARGV[0].eql?('up')

@@ -16,6 +16,7 @@ ExecStart=/usr/bin/rkt run --net=host --dns=host \
   --dhcp-userclass=set:ipxe,iPXE \
   --dhcp-boot=tag:#ipxe,undionly.kpxe \
   --dhcp-boot=tag:ipxe,http://matchbox.kube.com:8080/boot.ipxe \
+  --dhcp-option=3 \
   --address=/matchbox.kube.com/192.168.99.2 \
   --ptr-record=2.99.168.192.in-addr.arpa,matchbox.kube.com \
   --cname=cluster.kube.com,master-1.kube.com \

@@ -33,10 +33,9 @@ Vagrant.configure("2") do |config|
     config.vm.network :private_network, ip: "192.168.99.2"
     config.vm.provider :virtualbox do |vb|
       vb.gui = $vm_gui
-      vb.memory = $vm_memory
+      vb.memory = $matchbox_memory
       vb.cpus = $vm_cpus
       vb.customize ["modifyvm", :id, "--cpuexecutioncap", "#{$vb_cpuexecutioncap}"]
-      vb.customize ["modifyvm", :id, "--macaddress2", $mac_addresses[:matchbox]]
     end
     config.vm.provision :file, :source => "provision/dnsmasq.service", :destination => "/tmp/dnsmasq.service"
     config.vm.provision :file, :source => "provision/matchbox.service", :destination => "/tmp/matchbox.service"
@@ -46,7 +45,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision :shell, :path => "provision/matchbox.sh", :privileged => true
   end
 
-  $mac_addresses.keys().each do |client|
+  $node_data.keys().each do |client|
     config.vm.define client do |pxe_client|
 
       #SSH Config
@@ -65,7 +64,13 @@ Vagrant.configure("2") do |config|
 
       pxe_client.vm.provider :virtualbox do |vb|
         vb.gui = $vm_gui
-        vb.memory = 2048
+        if client =~ /master/ then
+          vb.memory = $master_memory
+        elsif client =~ /node/ then
+          vb.memory = $node_memory
+        else
+          vb.memory = 1024
+        end
         vb.cpus = $vm_cpus
         vb.customize ["modifyvm", :id, "--usb", "on"]
         vb.customize ["modifyvm", :id, "--usbehci", "off"]
@@ -73,17 +78,19 @@ Vagrant.configure("2") do |config|
         # PXE Booting Voodoo
         vb.customize [
           'modifyvm', :id,
+          '--nictype2', '82540EM',
           '--nic2', 'hostonly',
           '--hostonlyadapter2', 'vboxnet0',
           '--boot1', 'disk',
           '--boot2', 'net',
           '--boot3', 'none',
           '--boot4', 'none',
-          '--macaddress2', $mac_addresses[client],
+          '--macaddress2', $node_data[client][:mac],
           '--nicbootprio2', '1'
         ]
       end
 
+      # Copy up bootkube config and move into place
       pxe_client.vm.provision :file, :source => "config/assets", :destination => "/home/core"
       pxe_client.vm.provision :shell, :path => "provision/nodes.sh", :privileged => true
 
