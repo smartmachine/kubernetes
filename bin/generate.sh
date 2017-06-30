@@ -1,5 +1,16 @@
-#!/bin/bash -e
-# note: Script uses -batch and -subj, instead of interactive prompts.
+#!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  BINPATH=bin/linux
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  BINPATH=bin/darwin
+else
+  echo "Your operating system is not currently supported.  Please use MacOS or Linux."
+  exit 1
+fi
+
+rm -rf config/bootkube
+${BINPATH}/bootkube render --asset-dir config/bootkube --api-servers https://cluster.kube.com:443 --api-server-alt-names=DNS=cluster.kube.com --etcd-servers https://master-1.kube.com:2379 --pod-cidr 10.2.0.0/16 --service-cidr 10.3.0.0/16 --experimental-calico-network-policy
 
 export SAN=DNS.1:matchbox.kube.com,IP.1:192.168.99.2
 
@@ -12,7 +23,7 @@ if [ -z $SAN ]
   exit 1
 fi
 
-echo "Creating example CA, server cert/key, and client cert/key..."
+echo "Creating self signed CA, server cert/key, and client cert/key..."
 
 # basic files/directories
 mkdir -p {certs,crl,newcerts}
@@ -42,7 +53,3 @@ openssl ca -batch -config ../../openssl.conf -extensions usr_cert -days 365 -not
 
 # Remove CSR's
 rm -rf *.csr certs crl index* newcerts serial*
-
-echo "*******************************************************************"
-echo "WARNING: Generated credentials are self-signed. Prefer your"
-echo "organization's PKI for production deployments."

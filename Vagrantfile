@@ -91,7 +91,7 @@ Vagrant.configure("2") do |config|
       end
 
       # Copy up bootkube config and move into place
-      pxe_client.vm.provision :file, :source => "config/assets", :destination => "/home/core"
+      pxe_client.vm.provision :file, :source => "config/bootkube", :destination => "/home/core"
       pxe_client.vm.provision :shell, :path => "provision/nodes.sh", :privileged => true
 
     end
