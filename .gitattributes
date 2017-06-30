@@ -1,2 +1,4 @@
 bin/bootkube filter=lfs diff=lfs merge=lfs -text
 bin/istioctl filter=lfs diff=lfs merge=lfs -text
+keys/id_rsa filter=git-crypt diff=git-crypt
+keys/id_rsa.pub filter=git-crypt diff=git-crypt
