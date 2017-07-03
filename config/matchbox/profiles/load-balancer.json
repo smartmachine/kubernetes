@@ -1,0 +1,5 @@
+{
+	"id": "load-balancer",
+	"ignition_id": "load-balancer.yaml.tmpl",
+	"boot": {}
+}

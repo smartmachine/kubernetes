@@ -1,0 +1,105 @@
+---
+systemd:
+  units:
+    - name: docker.service
+      enable: true
+    - name: nginx.service
+      enable: true
+      contents: |
+        [Unit]
+        Description=Nginx
+        Requires=network-online.target
+        After=network-online.target
+
+        [Service]
+        Slice=machine.slice
+        ExecStartPre=/bin/mkdir -p /etc/nginx
+        ExecStartPre=/bin/mkdir -p /srv/nginx
+        ExecStartPre=/bin/cp /root/nginx.conf /etc/nginx/nginx.conf
+        ExecStartPre=/bin/cp /root/index.html /srv/nginx/index.html 
+        ExecStart=/usr/bin/rkt run \
+          --net=host \
+          --insecure-options=image \
+          --volume nginxconf,kind=host,source=/etc/nginx/nginx.conf \
+          --mount volume=nginxconf,target=/etc/nginx/nginx.conf \
+          --volume indexhtml,kind=host,source=/srv/nginx/index.html \
+          --mount volume=indexhtml,target=/usr/share/nginx/html/index.html \
+          docker://nginx:alpine
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  {{ if index . "pxe" }}
+  disks:
+    - device: /dev/sda
+      wipe_table: true
+      partitions:
+        - label: ROOT
+  filesystems:
+    - name: root
+      mount:
+        device: "/dev/sda1"
+        format: "ext4"
+        create:
+          force: true
+          options:
+            - "-LROOT"
+  {{end}}
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.domain_name}}
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+    - path: /root/nginx.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          user  nginx;                                        
+          worker_processes  1;                                
+
+          error_log  /var/log/nginx/error.log warn;           
+          pid        /var/run/nginx.pid;                      
+
+          events {                                            
+            worker_connections  1024;                       
+          }                                                   
+
+          http {                                              
+            include       /etc/nginx/mime.types;            
+            default_type  application/octet-stream;         
+            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" ' '$status $body_bytes_sent "$http_referer" ' '"$http_user_agent" "$http_x_forwarded_for"';                                     
+            access_log  /var/log/nginx/access.log  main;    
+            sendfile        on;                             
+            #tcp_nopush     on;                             
+
+            keepalive_timeout  65;                          
+            #gzip  on;                                      
+
+            include /etc/nginx/conf.d/*.conf;               
+          }
+    - path: /root/index.html
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          <html>
+            <head>
+              <title>cluster.kube.com</title>
+            </head>
+            <body>
+              <H1>cluster.kube.com</H1>
+            </body>
+          </html>
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - {{.ssh_authorized_key}}

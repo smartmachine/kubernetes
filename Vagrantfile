@@ -72,8 +72,9 @@ Vagrant.configure("2") do |config|
           vb.memory = 1024
         end
         vb.cpus = $vm_cpus
-        vb.customize ["modifyvm", :id, "--usb", "on"]
+        vb.customize ["modifyvm", :id, "--usb", "off"]
         vb.customize ["modifyvm", :id, "--usbehci", "off"]
+        vb.customize ["modifyvm", :id, "--audio", "none"]
 
         # PXE Booting Voodoo
         vb.customize [
@@ -90,9 +91,11 @@ Vagrant.configure("2") do |config|
         ]
       end
 
-      # Copy up bootkube config and move into place
-      pxe_client.vm.provision :file, :source => "config/bootkube", :destination => "/home/core"
-      pxe_client.vm.provision :shell, :path => "provision/nodes.sh", :privileged => true
+      if client =~ /master/ || client =~ /node/ then
+        # Copy up bootkube config and move into place
+        pxe_client.vm.provision :file, :source => "config/bootkube", :destination => "/home/core"
+        pxe_client.vm.provision :shell, :path => "provision/nodes.sh", :privileged => true
+      end
 
     end
   end
