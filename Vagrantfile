@@ -8,6 +8,18 @@ Vagrant.require_version ">= 1.6.0"
 CONFIG = File.join(File.dirname(__FILE__), "config/config.rb")
 if File.exist?(CONFIG)
   require CONFIG
+else
+  puts "It doesn't seem like you have configured this project yet!\n\n"
+  puts "You have to do the following to get going:"
+  puts "  1. Copy config/config.rb.in to config/config.rb and edit to taste."
+  puts "  2. Run bin/generate.sh to generate bootkube assets and matchbox certificates."
+  puts "  3. Add the following to your dnsmasq configuration (strongly recommended!):"
+  puts "       address=/admin/192.168.99.3"
+  puts "       address=/web/192.168.99.3"
+  puts "       server=/kube.com/192.168.99.2"
+  puts "       server=/99.168.192.in-addr.arpa/192.168.99.2\n\n"
+  puts "Good luck!"
+  exit! 
 end
 CLOUD_CONFIG_PATH = File.join(File.dirname(__FILE__), "config/user-data")
 
