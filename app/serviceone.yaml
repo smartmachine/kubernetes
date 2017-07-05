@@ -1,7 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: serviceone
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app: serviceone
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: serviceone-deployment
+  name: serviceone
 spec:
   replicas: 1
   template:

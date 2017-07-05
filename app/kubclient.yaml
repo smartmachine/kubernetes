@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubclient
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app: kubclient
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kubclient
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubclient
+    spec:
+      containers:
+      - name: kubclient
+        image: cluster.kube.com:30500/kubclient:0.0.1-SNAPSHOT
+        ports:
+        - containerPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: simple-ingress
+  annotations:
+    kubernetes.io/ingress.class: istio
+spec:
+  rules:
+  - host: serviceone
+    http:
+      paths:
+      - backend:
+          serviceName: kubclient
+          servicePort: 80
