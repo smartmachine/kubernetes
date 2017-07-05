@@ -3,3 +3,4 @@ config/user-data
 config/bootkube
 config/matchbox/certs
 config/config.rb
+.*-ssh

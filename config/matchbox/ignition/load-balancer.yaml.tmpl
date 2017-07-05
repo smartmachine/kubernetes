@@ -13,15 +13,19 @@ systemd:
 
         [Service]
         Slice=machine.slice
-        ExecStartPre=/bin/mkdir -p /etc/nginx
+        ExecStartPre=/bin/mkdir -p /etc/nginx/conf.d
         ExecStartPre=/bin/mkdir -p /srv/nginx
         ExecStartPre=/bin/cp /root/nginx.conf /etc/nginx/nginx.conf
+        ExecStartPre=/usr/bin/bash -c "/bin/cp /root/server-*.conf /etc/nginx/conf.d"
         ExecStartPre=/bin/cp /root/index.html /srv/nginx/index.html 
         ExecStart=/usr/bin/rkt run \
           --net=host \
+          --dns=host \
           --insecure-options=image \
           --volume nginxconf,kind=host,source=/etc/nginx/nginx.conf \
           --mount volume=nginxconf,target=/etc/nginx/nginx.conf \
+          --volume nginxconfd,kind=host,source=/etc/nginx/conf.d \
+          --mount volume=nginxconfd,target=/etc/nginx/conf.d \
           --volume indexhtml,kind=host,source=/srv/nginx/index.html \
           --mount volume=indexhtml,target=/usr/share/nginx/html/index.html \
           docker://nginx:alpine
@@ -84,6 +88,77 @@ storage:
             #gzip  on;                                      
 
             include /etc/nginx/conf.d/*.conf;               
+          }
+    - path: /root/server-default.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          server {
+            listen 80 default_server;
+            server_name _;
+            server_name_in_redirect off;
+            root /usr/share/nginx/html;
+          }
+    - path: /root/server-admin.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          server {
+            listen 80;
+            server_name kubernetes.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30000;
+            }
+          }
+          server {
+            listen 80;
+            server_name grafana.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30001;
+            }
+          }
+          server {
+            listen 80;
+            server_name kibana.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30002;
+            }
+          }
+          server {
+            listen 80;
+            server_name istio-grafana.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30003;
+            }
+          }
+          server {
+            listen 80;
+            server_name istio-sg.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30005;
+            }
+          }
+          server {
+            listen 80;
+            server_name istio-zipkin.admin;
+            location / {
+              proxy_pass http://cluster.kube.com:30006;
+            }
+          }
+    - path: /root/server-web.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          server {
+            listen 80;
+            server_name ~^(?<app>\w+)\.web$;
+            location / {
+              proxy_pass http://cluster.kube.com:32000;
+              proxy_set_header Host $app;
+            }
           }
     - path: /root/index.html
       filesystem: root
