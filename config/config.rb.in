@@ -7,7 +7,7 @@ $vm_private_key = File.join(File.dirname(__FILE__), "../keys/id_rsa")
 $vm_public_key = File.join(File.dirname(__FILE__), "../keys/id_rsa.pub")
 $vm_gui = false
 $matchbox_memory = 1024
-$master_memory = 2048
+$master_memory = 3072
 $node_memory = 4096
 $vm_cpus = 2
 $vb_cpuexecutioncap = 100
@@ -24,6 +24,9 @@ $node_data = {
   },
   :node_3   => {
     :mac => '0800278DC17D'
+  },
+  :lb => {
+    :mac => '0800278DC13D'
   }
 }
 
