@@ -23,19 +23,19 @@ spec:
     spec:
       containers:
       - name: kubclient
-        image: cluster.kube.com:30500/kubclient:0.0.1-SNAPSHOT
+        image: cluster.kube.com:30500/kubclient:0.0.4
         ports:
         - containerPort: 8080
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: simple-ingress
+  name: kubclient
   annotations:
     kubernetes.io/ingress.class: istio
 spec:
   rules:
-  - host: serviceone
+  - host: kubclient
     http:
       paths:
       - backend:

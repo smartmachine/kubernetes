@@ -23,6 +23,6 @@ spec:
     spec:
       containers:
       - name: serviceone
-        image: cluster.kube.com:30500/serviceone:0.0.1-SNAPSHOT
+        image: cluster.kube.com:30500/serviceone:0.1.0
         ports:
         - containerPort: 8080
