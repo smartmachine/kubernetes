@@ -2,8 +2,9 @@
 echo "Installing Kubernetes auth config"
 cp /home/core/bootkube/auth/kubeconfig /etc/kubernetes/kubeconfig
 echo "Installing etcd auth config"
-mkdir -p /etc/ssl/etcd
+mkdir -p /etc/ssl/etcd/etcd
 cp /home/core/bootkube/tls/etcd-* /etc/ssl/etcd/
+cp /home/core/bootkube/tls/etcd/* /etc/ssl/etcd/etcd/
 chown -R etcd:etcd /etc/ssl/etcd
 chmod -R 500 /etc/ssl/etcd
 if [ -d /opt/bootkube ] ; then
