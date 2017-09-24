@@ -53,7 +53,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision :file, :source => "provision/matchbox.service", :destination => "/tmp/matchbox.service"
     config.vm.provision :file, :source => "provision/get-coreos", :destination => "/tmp/get-coreos"
     config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
-    config.vm.provision :file, :source => "config/matchbox", :destination => "/home/core"
+    config.vm.provision :file, :source => "config/matchbox", :destination => "/home/core/matchbox"
     config.vm.provision :shell, :path => "provision/matchbox.sh", :privileged => true
   end
 
@@ -105,7 +105,7 @@ Vagrant.configure("2") do |config|
 
       if client =~ /master/ || client =~ /node/ then
         # Copy up bootkube config and move into place
-        pxe_client.vm.provision :file, :source => "config/bootkube", :destination => "/home/core"
+        pxe_client.vm.provision :file, :source => "config/bootkube", :destination => "/home/core/bootkube"
         pxe_client.vm.provision :shell, :path => "provision/nodes.sh", :privileged => true
       end
 
