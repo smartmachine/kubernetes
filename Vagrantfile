@@ -74,6 +74,15 @@ Vagrant.configure("2") do |config|
       # Switch off folder syncing
       pxe_client.vm.synced_folder '.', '/vagrant', disabled: true
 
+      # Serial logging
+      if $enable_serial_logging
+        logdir = File.join(File.dirname(__FILE__), "log")
+        FileUtils.mkdir_p(logdir)
+
+        serialFile = File.join(logdir, "%s-serial.txt" % client)
+        FileUtils.touch(serialFile)
+      end
+
       pxe_client.vm.provider :virtualbox do |vb|
         vb.gui = $vm_gui
         if client =~ /master/ then
@@ -87,6 +96,10 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--usb", "off"]
         vb.customize ["modifyvm", :id, "--usbehci", "off"]
         vb.customize ["modifyvm", :id, "--audio", "none"]
+        if $enable_serial_logging
+          vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+          vb.customize ["modifyvm", :id, "--uartmode1", serialFile]
+        end
 
         # PXE Booting Voodoo
         vb.customize [

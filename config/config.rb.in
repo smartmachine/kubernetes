@@ -12,6 +12,8 @@ $node_memory = 4096
 $vm_cpus = 2
 $vb_cpuexecutioncap = 100
 
+$enable_serial_logging = false
+
 $node_data = {
   :master_1 => {
     :mac => '0800278DC14D'

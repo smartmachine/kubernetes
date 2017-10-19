@@ -7,6 +7,10 @@ echo "Provisioning matchbox"
 mkdir -p /var/lib/matchbox/assets
 mv -i /home/core/matchbox/* /var/lib/matchbox
 rm -rf /home/core/matchbox
+COREOS_VERSION=$(grep DISTRIB_RELEASE /etc/lsb-release | sed 's/^.*=//g')
+echo "CoreOS Version: ${COREOS_VERSION}"
+sed -i "s/@COREOS_VERSION@/${COREOS_VERSION}/g" /var/lib/matchbox/ignition/linux-install.yaml.tmpl
+sed -i "s/@COREOS_VERSION@/${COREOS_VERSION}/g" /var/lib/matchbox/profiles/linux-install.json
 echo "Downloading coreos distribution"
 cd /var/lib/matchbox/assets
 /tmp/get-coreos stable $(grep DISTRIB_RELEASE /etc/lsb-release | sed 's/^.*=//g') .

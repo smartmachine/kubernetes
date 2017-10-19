@@ -1,0 +1,19 @@
+{
+	"id": "linux-install",
+	"ignition_id": "linux-install.yaml.tmpl",
+	"boot": {
+		"kernel": "/assets/coreos/@COREOS_VERSION@/coreos_production_pxe.vmlinuz",
+		"initrd": [
+			"/assets/coreos/@COREOS_VERSION@/coreos_production_pxe_image.cpio.gz"
+		],
+		"args": [
+			"coreos.config.url=http://matchbox.kube.com:8080/ignition?uuid=${uuid}\u0026mac=${mac:hexhyp}",
+			"coreos.first_boot=1",
+			"console=tty0",
+			"console=ttyS0",
+                        "systemd.log_level=debug",
+                        "systemd.log_target=console",
+                        "systemd.journald.forward_to_console=1"
+		]
+	}
+}

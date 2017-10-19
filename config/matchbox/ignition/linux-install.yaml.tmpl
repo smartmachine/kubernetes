@@ -25,9 +25,8 @@ systemd:
       enable: true
 storage:
   files:
-    - path: /opt/installer
-      filesystem: root
-      mode: 0500
+    - filesystem: root
+      path: /opt/installer
       contents:
         inline: |
           #!/bin/bash -ex
@@ -41,18 +40,33 @@ storage:
             -i ignition.json
           udevadm settle
           systemctl reboot
-    - path: /var/lib/iptables/rules-save
-      filesystem: root
-      mode: 0644
-      owner: root:root
+      mode: 320
+      user:
+        name: root
+      group:
+        name: root
+    - filesystem: root
+      path: /var/lib/iptables/rules-save
       contents:
         inline: |
           *filter
           -A INPUT -p tcp --dport 22 -j DROP
           COMMIT
+      mode: 420
+      user:
+        name: root
+      group:
+        name: root
+  directories:
+    filesystem: root
+    path: /opt
+    mode: 493
+    user:
+      name: root
+    group:
+      name: root
 passwd:
   users:
     - name: core
       ssh_authorized_keys:
         - {{.ssh_authorized_key}}
-
