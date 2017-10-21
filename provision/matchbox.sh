@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-echo "Moving Cloud Config data into place"
-mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/
 echo "Configuring matchbox certificates"
 mv /home/core/matchbox/certs /etc/matchbox
 echo "Provisioning matchbox"

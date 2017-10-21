@@ -5,6 +5,19 @@ require 'fileutils'
 
 Vagrant.require_version ">= 1.6.0"
 
+# Make sure the vagrant-ignition plugin is installed
+required_plugins = %w(vagrant-ignition)
+
+plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+if not plugins_to_install.empty?
+  puts "Installing plugins: #{plugins_to_install.join(' ')}"
+  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+    exec "vagrant #{ARGV.join(' ')}"
+  else
+    abort "Installation of one or more plugins has failed. Aborting."
+  end
+end
+
 CONFIG = File.join(File.dirname(__FILE__), "config/config.rb")
 if File.exist?(CONFIG)
   require CONFIG
@@ -21,7 +34,8 @@ else
   puts "Good luck!"
   exit! 
 end
-CLOUD_CONFIG_PATH = File.join(File.dirname(__FILE__), "config/user-data")
+
+IGNITION_CONFIG_PATH = File.join(File.dirname(__FILE__), "config/ignition.json")
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
@@ -39,20 +53,26 @@ Vagrant.configure("2") do |config|
     if $image_version != "current"
       config.vm.box_version = $image_version
     end
-    config.vm.box_url = "https://storage.googleapis.com/%s.release.core-os.net/amd64-usr/%s/coreos_production_vagrant.json" % [$update_channel, $image_version]
+    config.vm.box_url = "https://%s.release.core-os.net/amd64-usr/%s/coreos_production_vagrant_virtualbox.json" % [$update_channel, $image_version]
 
+    config.ignition.enabled = true 
     config.vm.hostname = vm_name
     config.vm.network :private_network, ip: "192.168.99.2"
+
     config.vm.provider :virtualbox do |vb|
       vb.gui = $vm_gui
       vb.memory = $matchbox_memory
       vb.cpus = $vm_cpus
       vb.customize ["modifyvm", :id, "--cpuexecutioncap", "#{$vb_cpuexecutioncap}"]
+      config.ignition.config_obj = vb
+      config.ignition.hostname = vm_name
+      config.ignition.ip = "192.168.99.2"
+      config.ignition.path = "config/ignition.json"
     end
+
     config.vm.provision :file, :source => "provision/dnsmasq.service", :destination => "/tmp/dnsmasq.service"
     config.vm.provision :file, :source => "provision/matchbox.service", :destination => "/tmp/matchbox.service"
     config.vm.provision :file, :source => "provision/get-coreos", :destination => "/tmp/get-coreos"
-    config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
     config.vm.provision :file, :source => "config/matchbox", :destination => "/home/core/matchbox"
     config.vm.provision :shell, :path => "provision/matchbox.sh", :privileged => true
   end

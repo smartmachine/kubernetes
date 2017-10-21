@@ -11,9 +11,7 @@
 			"coreos.first_boot=1",
 			"console=tty0",
 			"console=ttyS0",
-                        "systemd.log_level=debug",
-                        "systemd.log_target=console",
-                        "systemd.journald.forward_to_console=1"
+                        "systemd.journald.max_level_console=debug"
 		]
 	}
 }

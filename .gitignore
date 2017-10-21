@@ -3,4 +3,5 @@ config/user-data
 config/bootkube
 config/matchbox/certs
 config/config.rb
+config/ignition.json*
 .*-ssh
