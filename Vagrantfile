@@ -40,7 +40,7 @@ IGNITION_CONFIG_PATH = File.join(File.dirname(__FILE__), "config/ignition.json")
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
-  config.ssh.private_key_path = [$vm_private_key, "~/.vagrant.d/insecure_private_key"]
+  config.ssh.private_key_path = [$vm_private_key]
 
   config.vm.provider :virtualbox do |v|
     v.check_guest_additions = false
