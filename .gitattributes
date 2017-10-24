@@ -1,4 +1,8 @@
 keys/id_rsa filter=git-crypt diff=git-crypt
 keys/id_rsa.pub filter=git-crypt diff=git-crypt
+config/ignition/ignition.yaml filter=git-crypt diff=git-crypt
+config/matchbox/groups/* filter=git-crypt diff=git-crypt
 bin/linux/* filter=lfs diff=lfs merge=lfs -text
 bin/darwin/* filter=lfs diff=lfs merge=lfs -text
+bin/linux/ct filter=lfs diff=lfs merge=lfs -text
+bin/darwin/ct filter=lfs diff=lfs merge=lfs -text

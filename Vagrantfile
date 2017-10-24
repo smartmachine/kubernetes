@@ -2,7 +2,6 @@
 # vi: set ft=ruby :
 
 require 'fileutils'
-
 Vagrant.require_version ">= 1.6.0"
 
 # Make sure the vagrant-ignition plugin is installed
@@ -68,7 +67,7 @@ Vagrant.configure("2") do |config|
       config.ignition.hostname = vm_name + ".kube.com"
       config.ignition.drive_root = "config/ignition"
       config.ignition.ip = "192.168.99.2"
-      config.ignition.path = "../ignition.json"
+      config.ignition.path = "ignition.json"
     end
 
     config.vm.provision :file, :source => "provision/dnsmasq.service", :destination => "/tmp/dnsmasq.service"

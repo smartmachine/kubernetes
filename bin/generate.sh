@@ -3,6 +3,7 @@
 set -e
 set -o pipefail
 
+echo "Determining operating system"
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   BINPATH=bin/linux
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -12,9 +13,11 @@ else
   exit 1
 fi
 
+echo "Rendering bootkube configurations"
 rm -rf config/bootkube
 ${BINPATH}/bootkube render --asset-dir config/bootkube --api-servers https://cluster.kube.com:443 --api-server-alt-names=DNS=cluster.kube.com --etcd-servers https://master-1.kube.com:2379 --pod-cidr 10.2.0.0/16 --service-cidr 10.3.0.0/16 --network-provider experimental-calico
 
+echo "Creating matchbox certificates"
 export SAN=DNS.1:matchbox.kube.com,IP.1:192.168.99.2
 
 rm -rf config/matchbox/certs
@@ -56,3 +59,7 @@ openssl ca -batch -config ../../openssl.conf -extensions usr_cert -days 365 -not
 
 # Remove CSR's
 rm -rf *.csr certs crl index* newcerts serial*
+
+echo "Transpiling Container Linux Config to ignition JSON"
+cd ../../..
+${BINPATH}/ct -strict -platform vagrant-virtualbox < config/ignition/ignition.yaml > config/ignition/ignition.json

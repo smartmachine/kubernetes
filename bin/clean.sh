@@ -12,4 +12,4 @@ fi
 echo "Removing all generated artifacts ...."
 rm -rf config/bootkube
 rm -rf config/matchbox/certs
-rm -rf config/user-data
+rm -rf config/ignition/ignition.json*
