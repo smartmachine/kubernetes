@@ -11,7 +11,7 @@ sed -i "s/@COREOS_VERSION@/${COREOS_VERSION}/g" /var/lib/matchbox/ignition/linux
 sed -i "s/@COREOS_VERSION@/${COREOS_VERSION}/g" /var/lib/matchbox/profiles/linux-install.json
 echo "Downloading coreos distribution"
 cd /var/lib/matchbox/assets
-/tmp/get-coreos stable $(grep DISTRIB_RELEASE /etc/lsb-release | sed 's/^.*=//g') .
+/tmp/get-coreos alpha ${COREOS_VERSION} .
 rm -rf /tmp/get-coreos
 echo "Installing matchbox service"
 mv /tmp/matchbox.service /etc/systemd/system

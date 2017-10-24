@@ -65,9 +65,10 @@ Vagrant.configure("2") do |config|
       vb.cpus = $vm_cpus
       vb.customize ["modifyvm", :id, "--cpuexecutioncap", "#{$vb_cpuexecutioncap}"]
       config.ignition.config_obj = vb
-      config.ignition.hostname = vm_name
+      config.ignition.hostname = vm_name + ".kube.com"
+      config.ignition.drive_root = "config/ignition"
       config.ignition.ip = "192.168.99.2"
-      config.ignition.path = "config/ignition.json"
+      config.ignition.path = "../ignition.json"
     end
 
     config.vm.provision :file, :source => "provision/dnsmasq.service", :destination => "/tmp/dnsmasq.service"
@@ -110,7 +111,7 @@ Vagrant.configure("2") do |config|
         elsif client =~ /node/ then
           vb.memory = $node_memory
         else
-          vb.memory = 1024
+          vb.memory = 2048
         end
         vb.cpus = $vm_cpus
         vb.customize ["modifyvm", :id, "--usb", "off"]

@@ -5,3 +5,6 @@ config/matchbox/certs
 config/config.rb
 config/ignition.json*
 .*-ssh
+config.img
+config.vmdk
+log
