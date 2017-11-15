@@ -33,7 +33,7 @@ storage:
           curl "http://matchbox.kube.com:8080/ignition?{{.request.raw_query}}&os=installed" -o ignition.json
           coreos-install \
             -d /dev/sda \
-            -C stable \
+            -C alpha \
             -V @COREOS_VERSION@ \
             -o "" \
             -b http://matchbox.kube.com:8080/assets/coreos \

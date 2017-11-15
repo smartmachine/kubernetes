@@ -44,8 +44,12 @@ systemd:
           --mount volume=resolv,target=/etc/resolv.conf \
           --volume var-lib-cni,kind=host,source=/var/lib/cni \
           --mount volume=var-lib-cni,target=/var/lib/cni \
+          --volume opt-cni-bin,kind=host,source=/opt/cni/bin \
+          --mount volume=opt-cni-bin,target=/opt/cni/bin \
           --volume var-log,kind=host,source=/var/log \
-          --mount volume=var-log,target=/var/log"
+          --mount volume=var-log,target=/var/log \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p /opt/cni/bin
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/checkpoint-secrets
@@ -98,8 +102,14 @@ storage:
       mode: 0644
       contents:
         inline: |
-          KUBELET_IMAGE_URL=quay.io/coreos/hyperkube
-          KUBELET_IMAGE_TAG=v1.7.7_coreos.0
+          KUBELET_IMAGE_URL=docker://gcr.io/google_containers/hyperkube
+          KUBELET_IMAGE_TAG=v1.8.2
+    - path: /etc/ssl/etcd/.empty
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          empty
     - path: /etc/hostname
       filesystem: root
       mode: 0644

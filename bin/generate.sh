@@ -50,12 +50,22 @@ openssl req -config ../../openssl.conf -new -sha256 -key server.key -out server.
 # Certificate Authority signs CSR to grant a certificate
 openssl ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in server.csr -out server.crt -cert ca.crt -keyfile ca.key
 
+
 # Client private key (unencrypted)
 openssl genrsa -out client.key 2048
 # Signed client certificate signing request (CSR)
 openssl req -config ../../openssl.conf -new -sha256 -key client.key -out client.csr -subj "/CN=fake-client"
 # Certificate Authority signs CSR to grant a certificate
 openssl ca -batch -config ../../openssl.conf -extensions usr_cert -days 365 -notext -md sha256 -in client.csr -out client.crt -cert ca.crt -keyfile ca.key
+
+export SAN=DNS.1:kubernetes.admin
+
+# Dashboard private key (unencrypted)
+openssl genrsa -out dashboard.key 2048
+# Dashboard certificate signing request (CSR)
+openssl req -config ../../openssl.conf -new -sha256 -key dashboard.key -out dashboard.csr -subj "/CN=kubernetes.admin"
+# Certificate Authority signs CSR to grant a certificate
+openssl ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in dashboard.csr -out dashboard.crt -cert ca.crt -keyfile ca.key
 
 # Remove CSR's
 rm -rf *.csr certs crl index* newcerts serial*

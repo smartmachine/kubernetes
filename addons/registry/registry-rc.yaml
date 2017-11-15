@@ -51,8 +51,7 @@ spec:
           protocol: TCP
       volumes:
       - name: image-store
-        persistentVolumeClaim:
-          claimName: kube-registry-pvc
+        emptyDir: {}
       - name: cert-dir
         secret:
           secretName: registry-tls-secret

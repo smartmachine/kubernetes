@@ -11,7 +11,7 @@
 			"coreos.first_boot=1",
 			"console=tty0",
 			"console=ttyS0",
-                        "systemd.journald.max_level_console=debug"
+			"systemd.journald.max_level_console=debug"
 		]
 	}
 }
