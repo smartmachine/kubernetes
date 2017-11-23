@@ -7,7 +7,7 @@
 			"/assets/coreos/@COREOS_VERSION@/coreos_production_pxe_image.cpio.gz"
 		],
 		"args": [
-			"coreos.config.url=http://matchbox.kube.com:8080/ignition?uuid=${uuid}\u0026mac=${mac:hexhyp}",
+			"coreos.config.url=http://192.168.99.2:8080/ignition?uuid=${uuid}\u0026mac=${mac:hexhyp}",
 			"coreos.first_boot=1",
 			"console=tty0",
 			"console=ttyS0",

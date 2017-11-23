@@ -30,13 +30,13 @@ storage:
       contents:
         inline: |
           #!/bin/bash -ex
-          curl "http://matchbox.kube.com:8080/ignition?{{.request.raw_query}}&os=installed" -o ignition.json
+          curl "http://192.168.99.2:8080/ignition?{{.request.raw_query}}&os=installed" -o ignition.json
           coreos-install \
             -d /dev/sda \
             -C alpha \
             -V @COREOS_VERSION@ \
             -o "" \
-            -b http://matchbox.kube.com:8080/assets/coreos \
+            -b http://192.168.99.2:8080/assets/coreos \
             -i ignition.json
           udevadm settle
           systemctl reboot

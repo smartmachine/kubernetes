@@ -134,6 +134,10 @@ Vagrant.configure("2") do |config|
           '--macaddress2', $node_data[client][:mac],
           '--nicbootprio2', '1'
         ]
+
+        # Resolver Voodoo
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver2", "on"]
       end
 
       if client =~ /master/ || client =~ /node/ then

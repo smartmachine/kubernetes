@@ -6,8 +6,10 @@ set -o pipefail
 echo "Determining operating system"
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   BINPATH=bin/linux
+  OPENSSL=`which openssl`
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   BINPATH=bin/darwin
+  OPENSSL=/usr/local/opt/openssl/bin/openssl
 else
   echo "Your operating system is not currently supported.  Please use MacOS or Linux."
   exit 1
@@ -37,35 +39,35 @@ touch index.txt
 echo 1000 > serial
 
 # CA private key (unencrypted)
-openssl genrsa -out ca.key 4096
+$OPENSSL genrsa -out ca.key 4096
 # Certificate Authority (self-signed certificate)
-openssl req -config ../../openssl.conf -new -x509 -days 3650 -sha256 -key ca.key -extensions v3_ca -out ca.crt -subj "/CN=fake-ca"
+$OPENSSL req -config ../../openssl.conf -new -x509 -days 3650 -sha256 -key ca.key -extensions v3_ca -out ca.crt -subj "/CN=fake-ca"
 
 # End-entity certificates
 
 # Server private key (unencrypted)
-openssl genrsa -out server.key 2048
+$OPENSSL genrsa -out server.key 2048
 # Server certificate signing request (CSR)
-openssl req -config ../../openssl.conf -new -sha256 -key server.key -out server.csr -subj "/CN=fake-server"
+$OPENSSL req -config ../../openssl.conf -new -sha256 -key server.key -out server.csr -subj "/CN=fake-server"
 # Certificate Authority signs CSR to grant a certificate
-openssl ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in server.csr -out server.crt -cert ca.crt -keyfile ca.key
+$OPENSSL ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in server.csr -out server.crt -cert ca.crt -keyfile ca.key
 
 
 # Client private key (unencrypted)
-openssl genrsa -out client.key 2048
+$OPENSSL genrsa -out client.key 2048
 # Signed client certificate signing request (CSR)
-openssl req -config ../../openssl.conf -new -sha256 -key client.key -out client.csr -subj "/CN=fake-client"
+$OPENSSL req -config ../../openssl.conf -new -sha256 -key client.key -out client.csr -subj "/CN=fake-client"
 # Certificate Authority signs CSR to grant a certificate
-openssl ca -batch -config ../../openssl.conf -extensions usr_cert -days 365 -notext -md sha256 -in client.csr -out client.crt -cert ca.crt -keyfile ca.key
+$OPENSSL ca -batch -config ../../openssl.conf -extensions usr_cert -days 365 -notext -md sha256 -in client.csr -out client.crt -cert ca.crt -keyfile ca.key
 
 export SAN=DNS.1:kubernetes.admin
 
 # Dashboard private key (unencrypted)
-openssl genrsa -out dashboard.key 2048
+$OPENSSL genrsa -out dashboard.key 2048
 # Dashboard certificate signing request (CSR)
-openssl req -config ../../openssl.conf -new -sha256 -key dashboard.key -out dashboard.csr -subj "/CN=kubernetes.admin"
+$OPENSSL req -config ../../openssl.conf -new -sha256 -key dashboard.key -out dashboard.csr -subj "/CN=kubernetes.admin"
 # Certificate Authority signs CSR to grant a certificate
-openssl ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in dashboard.csr -out dashboard.crt -cert ca.crt -keyfile ca.key
+$OPENSSL ca -batch -config ../../openssl.conf -extensions server_cert -days 365 -notext -md sha256 -in dashboard.csr -out dashboard.crt -cert ca.crt -keyfile ca.key
 
 # Remove CSR's
 rm -rf *.csr certs crl index* newcerts serial*

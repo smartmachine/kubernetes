@@ -1,0 +1,23 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: linkerd-endpoints-reader
+rules:
+  - apiGroups: ["", "extensions"]
+    resources: ["endpoints", "services", "pods", "ingresses"] # pod access is required for the *-legacy.yml examples in linkerd-examples
+    verbs: ["get", "watch", "list"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: linkerd-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: default # change this to your service account if you’ve specified one
+    namespace: l5d-system
+roleRef:
+  kind: ClusterRole
+  name: linkerd-endpoints-reader
+  apiGroup: rbac.authorization.k8s.io
